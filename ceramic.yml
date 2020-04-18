@@ -1,0 +1,12 @@
+app:
+    package: mycompany.ld46
+    name: ld46
+    displayName: ld46
+    author: My Company
+    version: '1.0'
+
+    libs: []
+
+    if web:
+        +defines:
+            - js-source-map
