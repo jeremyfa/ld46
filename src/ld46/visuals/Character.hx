@@ -23,7 +23,9 @@ class Character extends Quad implements Observable {
 
         this.characterData = characterData;
         
-        transparent = true;
+        transparent = false;
+        color = Color.GREEN;
+        
         size(BLOCK_SIZE, BLOCK_SIZE);
 
         shape = new CharacterShape(this);
@@ -46,11 +48,17 @@ class Character extends Quad implements Observable {
 
         var characterData = this.characterData;
 
-        x = characterData.x * BLOCK_SIZE;
-        y = characterData.y * BLOCK_SIZE;
+        var x = characterData.x * BLOCK_SIZE;
+        var y = characterData.y * BLOCK_SIZE;
 
         unobserve();
-        updateShapePosition();
+        shape.bounce();
+        var tween = this.transition(QUART_EASE_OUT, STEP_DURATION, props -> {
+            props.pos(x, y);
+        });
+        tween.onUpdate(this, (_, _) -> {
+            updateShapePosition();
+        });
         reobserve();
 
     }

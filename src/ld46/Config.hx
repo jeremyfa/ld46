@@ -8,6 +8,8 @@ class Config {
 
     public static final CROSS_COLOR = Color.RED;
 
+    public static final STEP_DURATION = 1.0;
+
     public static final CHARACTER_COLORS:Array<Color> = [
         Color.RED,
         Color.GREEN,

@@ -162,7 +162,7 @@ class LevelGrid extends Quad implements Observable {
             var characterVisual = characterVisuals[i];
             if (characterVisual == null) {
                 characterVisual = new Character(characterShapesLayer, charactersData[i]);
-                layers[1].add(characterVisual);
+                layers[0].add(characterVisual);
             }
             else {
                 characterVisual.characterData = charactersData[i];

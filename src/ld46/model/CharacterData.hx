@@ -28,18 +28,16 @@ class CharacterData extends Model {
         this.group = group;
         this.conduct = conduct;
 
-        /*
         var d = 0;
         Timer.interval(this, 1.0, () -> {
-            this.direction = switch (Std.random(4)) {
+            this.direction = switch (d) {
                 default: NORTH;
-                case 1: WEST;
+                case 1: EAST;
                 case 2: SOUTH;
-                case 3: EAST;
+                case 3: WEST;
             }
             d = (d + 1) % 4;
         });
-        */
 
     }
 

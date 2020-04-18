@@ -1,5 +1,6 @@
 package ld46.visuals;
 
+import ceramic.Transform;
 import ceramic.Tween;
 import ld46.enums.Direction;
 import ceramic.Quad;
@@ -20,7 +21,7 @@ class CharacterShape extends Visual {
         return color;
     }
 
-    var subShapes:Array<Shape> = [];
+    var subShapes:Array<Quad> = [];
 
     // Used in calculus in case we change BLOCK_SIZE later
     var factor = BLOCK_SIZE / 32;
@@ -31,41 +32,52 @@ class CharacterShape extends Visual {
 
     var turning:Bool = false;
 
+    var offsetX:Float;
+
+    var offsetY:Float;
+
     public function new(owner:Character) {
 
         super();
+
+        offsetX = -6 * factor;
+        offsetY = -1 * factor;
 
         this.owner = owner;
 
         size(BLOCK_SIZE, BLOCK_SIZE);
         anchor(0.5, 1);
 
-        var shape = new Shape();
+        var shape = new Quad();
+        /*
         shape.vertices = [
             0.2 * BLOCK_SIZE, 0,
             0.8 * BLOCK_SIZE, 0,
             0.8 * BLOCK_SIZE, BLOCK_SIZE,
             0.2 * BLOCK_SIZE, BLOCK_SIZE
         ];
-        shape.size(BLOCK_SIZE, BLOCK_SIZE);
+        */
+        shape.size(0.8 * BLOCK_SIZE, 1.5 * BLOCK_SIZE);
         shape.anchor(0.5, 1);
         shape.pos(width * 0.5, height);
         shape.skewY = -20;
+        shape.transform = new Transform();
         add(shape);
 
         subShapes.push(shape);
 
-        var shape = new Shape();
+        var shape = new Quad();
+        /*
         shape.vertices = [
             0.2 * BLOCK_SIZE, 0,
             0.8 * BLOCK_SIZE, 0,
             0.8 * BLOCK_SIZE, BLOCK_SIZE,
             0.2 * BLOCK_SIZE, BLOCK_SIZE
         ];
-        shape.size(BLOCK_SIZE, BLOCK_SIZE);
+        */
+        shape.size(0.8 * BLOCK_SIZE, 1.5 * BLOCK_SIZE);
         shape.anchor(0.5, 1);
-        shape.pos(width * 0.5 + 1, height + 1);
-        shape.skewY = -20;
+        shape.transform = subShapes[0].transform;
         add(shape);
 
         subShapes.push(shape);
@@ -88,11 +100,40 @@ class CharacterShape extends Visual {
         dir();
         */
 
+        /*
+        var odd = false;
+        Timer.interval(this, 1.0, () -> {
+            if (odd) {
+                trace('0');
+                applyOrientation(0);
+            }
+            else {
+                trace('180');
+                applyOrientation(180);
+            }
+            odd = !odd;
+        });
+        */
+
+    }
+
+    public function bounce():Void {
+
+        /*
+        var transform = subShapes[0].transform;
+        transform.identity();
+        transform.scale(1.25, 1 / 1.25);
+        tween(0.25, 0, 1, (v, t) -> {
+            transform.identity();
+            transform.scale(1.25 + (1 - 1.25) * v, (1 / 1.25) + (1 - (1 / 1.25)) * v);
+        });
+        */
+
     }
 
     public function turn(fromDirection:Direction, toDirection:Direction):Void {
 
-        //trace('TURN from $fromDirection to $toDirection');
+        trace('TURN from $fromDirection to $toDirection');
 
         if (turning) {
             app.onceUpdate(this, _ -> {
@@ -235,49 +276,49 @@ class CharacterShape extends Visual {
     }
 
     function _northSouth1Props0(props:VisualTransitionProperties):Void {
-        props.pos(width * 0.5 + 1.5 * factor + 4.25 * factor, height + 3.7 * factor);
+        props.pos(offsetX + width * 0.5 + 1.5 * factor + 3.2 * factor, offsetY + height + 0 * factor);
         props.scaleX = 0.85;
-        props.skewY = -143;
+        props.skewY = -144;
     }
 
     function _northSouth1Props1(props:VisualTransitionProperties):Void {
-        props.pos(width * 0.5 + 4.25 * factor, height + 3.7 * factor);
+        props.pos(offsetX + width * 0.5 + 3.2 * factor, offsetY + height + 0 * factor);
         props.scaleX = 0.85;
-        props.skewY = -143;
+        props.skewY = -144;
     }
 
     function _westEast2Props0(props:VisualTransitionProperties):Void {
-        props.pos(width * 0.5, height + 1.2 * factor);
+        props.pos(offsetX + width * 0.5 + 4 * factor, offsetY + height + 0 * factor);
         props.scaleX = 1;
         props.skewY = -20;
     }
 
     function _westEast2Props1(props:VisualTransitionProperties):Void {
-        props.pos(width * 0.5 + 1 * factor, height + 1 * factor + 1.2 * factor);
+        props.pos(offsetX + width * 0.5 + 1 * factor + 4 * factor, offsetY + height + 1 * factor + 0 * factor);
         props.scaleX = 1;
         props.skewY = -20;
     }
 
     function _northSouth3Props0(props:VisualTransitionProperties):Void {
-        props.pos(width * 0.5 + 1.5 * factor, height);
+        props.pos(offsetX + width * 0.5 + 1.5 * factor + 3.3 * factor, offsetY + height);
         props.scaleX = 0.85;
-        props.skewY = 37;
+        props.skewY = 36;
     }
 
     function _northSouth3Props1(props:VisualTransitionProperties):Void {
-        props.pos(width * 0.5, height);
+        props.pos(offsetX + width * 0.5 + 3.3 * factor, offsetY + height);
         props.scaleX = 0.85;
-        props.skewY = 37;
+        props.skewY = 36;
     }
 
     function _westEast0Props0(props:VisualTransitionProperties):Void {
-        props.pos(width * 0.5 - 1 * factor + 7 * factor, height - 1 * factor);
+        props.pos(offsetX + width * 0.5 - 1 * factor + 5 * factor, offsetY + height - 1 * factor + 1 * factor);
         props.skewY = -200;
         props.scaleX = 1;
     }
 
     function _westEast0Props1(props:VisualTransitionProperties):Void {
-        props.pos(width * 0.5 + 7 * factor, height);
+        props.pos(offsetX + width * 0.5 + 5 * factor, offsetY + height + 1 * factor);
         props.skewY = -200;
         props.scaleX = 1;
     }

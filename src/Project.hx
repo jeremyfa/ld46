@@ -1,5 +1,6 @@
 package;
 
+import ceramic.Timer;
 import ld46.levels.Levels;
 import ld46.model.SaveData;
 import ld46.visuals.LevelGrid;
@@ -54,6 +55,10 @@ class Project extends Entity {
         var levelGrid = new LevelGrid(level);
         levelGrid.anchor(0.5, 0.5);
         levelGrid.pos(screen.width * 0.5, screen.height * 0.5);
+
+        Timer.interval(this, STEP_DURATION, () -> {
+            level.step();
+        });
 
     }
 
