@@ -1,5 +1,6 @@
 package;
 
+import ceramic.Fonts;
 import ceramic.Timer;
 import ld46.levels.Levels;
 import ld46.model.SaveData;
@@ -23,6 +24,8 @@ class Project extends Entity {
         settings.targetWidth = 1024;
         settings.targetHeight = 768;
         settings.scaling = FIT;
+
+        settings.defaultFont = Fonts.ROBOTO_BOLD_20;
 
         app.onceReady(this, ready);
 
@@ -56,7 +59,7 @@ class Project extends Entity {
         levelGrid.anchor(0.5, 0.5);
         levelGrid.pos(screen.width * 0.5, screen.height * 0.5);
 
-        Timer.interval(this, STEP_DURATION, () -> {
+        Timer.interval(this, STEP_INTERVAL, () -> {
             level.step();
         });
 

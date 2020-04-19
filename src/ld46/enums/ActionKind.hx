@@ -6,7 +6,7 @@ enum ActionKind {
 
     TURN_RIGHT;
 
-    TURN_BACKWARD;
+    TURN_AROUND;
 
     JUMP_FORWARD;
 

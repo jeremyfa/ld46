@@ -20,6 +20,8 @@ class LevelGrid extends Quad implements Observable {
 
     var characterVisuals:Array<Character> = [];
 
+    var actionVisuals:Array<ActionStamp> = [];
+
     var layerTime = 0.0;
 
     var numRows:Int = 0;
@@ -37,6 +39,7 @@ class LevelGrid extends Quad implements Observable {
         updateLayersPosition();
 
         autorun(updateGridItems);
+        autorun(updateActionItems);
         autorun(updateCharacters);
         
     }
@@ -110,11 +113,22 @@ class LevelGrid extends Quad implements Observable {
             for (value in row) {
                 var item = gridVisuals[y * numCols + x];
                 if (item == null) {
-                    item = new LevelGridItem(value);
+                    item = new LevelGridItem(levelData, x, y, value);
                     gridVisuals[y * numCols + x] = item;
+                    ((item:LevelGridItem) -> {
+                        item.onPointerDown(this, info -> {
+                            levelData.click(
+                                item.blockX,
+                                item.blockY
+                            );
+                        });
+                    })(item);
                 }
                 else {
+                    item.levelData = levelData;
                     item.value = value;
+                    item.blockX = x;
+                    item.blockY = y;
                 }
                 item.pos(
                     x * BLOCK_SIZE,
@@ -123,7 +137,7 @@ class LevelGrid extends Quad implements Observable {
                 switch value {
                     case GROUND:
                         layers[0].add(item);
-                    case GOAL | KILL:
+                    case GOAL_A | GOAL_B | GOAL_C | GOAL_D | GOAL_E | KILL:
                         layers[1].add(item);
                     case WALL:
                         layers[2].add(item);
@@ -138,6 +152,56 @@ class LevelGrid extends Quad implements Observable {
         }
         
         updateLayersPosition();
+
+        reobserve();
+
+    }
+
+    function updateActionItems() {
+
+        var levelData = this.levelData;
+
+        if (levelData == null) {
+            unobserve();
+            for (item in actionVisuals) {
+                item.destroy();
+            }
+            actionVisuals = [];
+            return;
+        }
+
+        var actions = levelData.actions;
+        unobserve();
+
+        for (i in 0...actions.length) {
+            var actionData = actions[i];
+            var item = actionVisuals[i];
+            if (item == null) {
+                item = new ActionStamp(i + 1, actionData);
+                item.depth = 2;
+                actionVisuals[i] = item;
+                layers[0].add(item);
+            }
+            reobserve();
+            if (actionData.x != -1 && actionData.y != -1) {
+                unobserve();
+                item.active = true;
+                item.pos(
+                    BLOCK_SIZE * actionData.x,
+                    BLOCK_SIZE * actionData.y
+                );
+            }
+            else {
+                unobserve();
+                item.active = false;
+            }
+        }
+
+        while (actionVisuals.length > actions.length) {
+            actionVisuals.pop().destroy();
+        }
+
+        reobserve();
 
     }
 
@@ -160,18 +224,31 @@ class LevelGrid extends Quad implements Observable {
 
         for (i in 0...charactersData.length) {
             var characterVisual = characterVisuals[i];
+            var character = charactersData[i];
             if (characterVisual == null) {
-                characterVisual = new Character(characterShapesLayer, charactersData[i]);
-                layers[0].add(characterVisual);
+                characterVisual = new Character(characterShapesLayer, character);
+                characterVisuals[i] = characterVisual;
             }
             else {
-                characterVisual.characterData = charactersData[i];
+                characterVisual.characterData = character;
+            }
+
+            reobserve();
+            switch levelData.block(character.x, character.y) {
+                case GOAL_A | GOAL_B | GOAL_C | GOAL_D | GOAL_E:
+                    unobserve();
+                    layers[1].add(characterVisual);
+                default:
+                    unobserve();
+                    layers[0].add(characterVisual);
             }
         }
 
         while (characterVisuals.length > charactersData.length) {
             characterVisuals.pop().destroy();
         }
+
+        reobserve();
 
     }
 
