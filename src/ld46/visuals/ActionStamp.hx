@@ -24,6 +24,7 @@ class ActionStamp extends Quad {
         super();
 
         color = Color.WHITE;//Color.interpolate(ACTION_STAMP_COLOR, Color.WHITE, 0.5);
+        transparent = true;
 
         size(BLOCK_SIZE, BLOCK_SIZE);
 

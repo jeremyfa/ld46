@@ -3,7 +3,8 @@ package ld46;
 import ceramic.Entity;
 import tracker.Observable;
 import ld46.model.LevelData;
-import ld46.model.SaveData;
+import ld46.model.GameData;
+import ld46.ui.GameView;
 import ceramic.Assets;
 
 class Shared extends Entity implements Observable {
@@ -15,11 +16,8 @@ class Shared extends Entity implements Observable {
 
     public static var assets:Assets;
 
-    public static var save:SaveData;
+    public static var game:GameData;
 
-    @observe var _level:LevelData;
-    public static var level(get, set):LevelData;
-    static function get_level():LevelData return sharedInstance._level;
-    static function set_level(level:LevelData):LevelData return sharedInstance._level = level;
+    public static var view:GameView;
 
 }

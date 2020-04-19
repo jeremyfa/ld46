@@ -8,6 +8,8 @@ class Config {
 
     public static final STEP_INTERVAL = 0.5;
 
+    public static final BACKGROUND_COLOR:Color = 0x829DA5;
+
     public static final CROSS_COLOR = Color.RED;
 
     public static final ACTION_STAMP_COLOR = Color.BLACK;
@@ -20,12 +22,8 @@ class Config {
         Color.PURPLE
     ];
 
-    public static final BLOCK_WALL_COLOR = Color.BLACK;
+    public static final BLOCK_WALL_COLOR:Color = Color.BLACK;//0x666666;//0x4D4A6F;//Color.BLACK;
 
-    public static final BLOCK_GROUND_COLOR = Color.WHITE;
-
-    public static final BLOCK_GOAL_COLOR = Color.GREEN;
-
-    public static final BLOCK_KILL_COLOR = Color.RED;
+    public static final BLOCK_GROUND_COLOR:Color = 0xF6F4D3;//4D4A6F;//Color.WHITE;
 
 }

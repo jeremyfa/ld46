@@ -1,9 +1,12 @@
 package ld46.model;
 
 import ld46.enums.BlockKind;
+import ld46.enums.LevelStatus;
 import tracker.Model;
 
 class LevelData extends Model {
+
+    @observe public var status:LevelStatus = NONE;
 
     @observe public var grid:Array<Array<BlockKind>>;
 
@@ -21,6 +24,26 @@ class LevelData extends Model {
 
     }
 
+    override function destroy() {
+
+        super.destroy();
+
+        if (characters != null) {
+            for (character in characters) {
+                character.destroy();
+            }
+            characters = null;
+        }
+
+        if (actions != null) {
+            for (action in actions) {
+                action.destroy();
+            }
+            actions = null;
+        }
+        
+    }
+
     public function block(x:Float, y:Float):BlockKind {
         if (x < 0 || y < 0 || x >= grid[0].length || y >= grid.length)
             return KILL;
@@ -36,6 +59,9 @@ class LevelData extends Model {
      */
     public function step():Void {
 
+        if (status != RUNNING)
+            return;
+
         for (i in 0...characters.length) {
             var character = characters[i];
             if (character.status == ALIVE) {
@@ -44,6 +70,30 @@ class LevelData extends Model {
                     moveCharacter(character);
                 }
             }
+        }
+
+        checkEndOfGame();
+
+    }
+
+    function checkEndOfGame() {
+
+        var anyNotRescued = false;
+        for (i in 0...characters.length) {
+            var character = characters[i];
+            switch character.status {
+                case ALIVE:
+                    anyNotRescued = true;
+                case KILLED:
+                    status = LOST;
+                    return;
+                case RESCUED:
+                    // Rescued
+            }
+        }
+
+        if (!anyNotRescued) {
+            status = WON;
         }
 
     }
@@ -91,6 +141,9 @@ class LevelData extends Model {
     }
 
     public function click(x:Int, y:Int):Void {
+
+        if (status != RUNNING)
+            return;
 
         var usedAction = usedActionStamp(x, y);
 

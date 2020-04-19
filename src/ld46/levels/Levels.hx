@@ -6,6 +6,8 @@ import ld46.model.LevelData;
 
 class Levels {
 
+    public static final NUM_LEVELS = 1;
+
     static final A:Int = 10;
     static final B:Int = 11;
     static final C:Int = 12;
