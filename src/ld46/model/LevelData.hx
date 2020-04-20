@@ -1,5 +1,6 @@
 package ld46.model;
 
+import ld46.enums.Direction;
 import ld46.enums.BlockKind;
 import ld46.enums.LevelStatus;
 import tracker.Model;
@@ -14,13 +15,16 @@ class LevelData extends Model {
 
     @observe public var actions:Array<ActionData>;
 
-    public function new(grid:Array<Array<BlockKind>>, characters:Array<CharacterData>, actions:Array<ActionData>) {
+    @observe public var tip:String = null;
+
+    public function new(grid:Array<Array<BlockKind>>, characters:Array<CharacterData>, actions:Array<ActionData>, ?tip:String) {
 
         super();
 
         this.grid = grid;
         this.characters = characters;
         this.actions = actions;
+        this.tip = tip;
 
     }
 
@@ -69,6 +73,7 @@ class LevelData extends Model {
                 if (character.status == ALIVE) {
                     moveCharacter(character);
                 }
+                character.forceDirection = false;
             }
         }
 
@@ -165,25 +170,52 @@ class LevelData extends Model {
     function applyCharacterCurrentBlock(character:CharacterData) {
 
         var usedAction = usedActionStamp(character.x, character.y);
+        
+        character.didJump = false;
+        var jumpDirection:Direction = NORTH;
 
         if (usedAction != null) {
             for (subAction in usedAction.subActions) {
                 switch subAction {
                     case TURN_LEFT:
                         character.turnLeft();
+                        character.forceDirection = true;
                     case TURN_RIGHT:
                         character.turnRight();
+                        character.forceDirection = true;
                     case TURN_AROUND:
                         character.turnAround();
+                        character.forceDirection = true;
+                    case MOVE_FORWARD:
+                        character.forceDirection = true;
                     case JUMP_FORWARD:
+                        if (blockForwardForwardCharacter(character) != WALL) {
+                            character.jumpForward();
+                            character.forceDirection = true;
+                            character.didJump = true;
+                            jumpDirection = character.direction;
+                        }
                     case JUMP_LEFT:
+                        character.turnLeft();
+                        if (blockForwardForwardCharacter(character) != WALL) {
+                            character.jumpForward();
+                            character.forceDirection = true;
+                            character.didJump = true;
+                            jumpDirection = character.direction;
+                        }
                     case JUMP_RIGHT:
-                    case JUMP_BACKWARD:
+                        character.turnRight();
+                        if (blockForwardForwardCharacter(character) != WALL) {
+                            character.jumpForward();
+                            character.forceDirection = true;
+                            character.didJump = true;
+                            jumpDirection = character.direction;
+                        }
                 }
             }
         }
 
-        switch [characters.indexOf(character), block(character.x, character.y)] {
+        switch [character.group, block(character.x, character.y)] {
 
             case [_, GROUND | WALL]:
                 // Nothing to do here
@@ -202,6 +234,13 @@ class LevelData extends Model {
 
         }
 
+        if (character.didJump && character.status == ALIVE) {
+            var actualDirection = character.direction;
+            character.direction = jumpDirection;
+            character.moveBackward();
+            character.direction = actualDirection;
+        }
+
     }
 
     function moveCharacter(character:CharacterData, attemptsLeft:Int = 4):Void {
@@ -211,38 +250,62 @@ class LevelData extends Model {
             return;
         }
 
-        switch blockForwardCharacter(character) {
-            case GROUND | KILL | GOAL_A | GOAL_B | GOAL_C | GOAL_D | GOAL_E:
-                log.debug('MOVE FORWARD');
-                character.moveForward();
-            case WALL:
-                log.debug('(facing wall)');
-                switch [
-                    blockBehindCharacter(character) == GROUND,
-                    blockOnTheLeftOfCharacter(character) == GROUND,
-                    blockOnTheRightOfCharacter(character) == GROUND
-                ] {
-                    case [_, true, true]:
-                        switch character.conduct {
-                            case PREFERS_LEFT:
-                                character.turnLeft();
-                                moveCharacter(character, attemptsLeft);
-                            case PREFERS_RIGHT:
-                                character.turnRight();
-                                moveCharacter(character, attemptsLeft);
-                        }
-                    case [_, true, false]:
+        var didTurn = false;
+        if (!character.forceDirection) {
+            if (character.conduct == PREFERS_LEFT) {
+                switch blockOnTheLeftOfCharacter(character) {
+                    case GROUND | KILL | GOAL_A | GOAL_B | GOAL_C | GOAL_D | GOAL_E:
                         character.turnLeft();
-                        moveCharacter(character, attemptsLeft);
-                    case [_, false, true]:
-                        character.turnRight();
-                        moveCharacter(character, attemptsLeft);
-                    case [true, false, false]:
-                        character.turnAround();
-                        moveCharacter(character, attemptsLeft);
+                        character.moveForward();
+                        didTurn = true;
                     default:
-                        log.debug('STOP');
                 }
+            }
+            else if (character.conduct == PREFERS_RIGHT) {
+                switch blockOnTheRightOfCharacter(character) {
+                    case GROUND | KILL | GOAL_A | GOAL_B | GOAL_C | GOAL_D | GOAL_E:
+                        character.turnRight();
+                        character.moveForward();
+                        didTurn = true;
+                    default:
+                }
+            }
+        }
+
+        if (!didTurn) {
+            switch blockForwardCharacter(character) {
+                case GROUND | KILL | GOAL_A | GOAL_B | GOAL_C | GOAL_D | GOAL_E:
+                    log.debug('MOVE FORWARD');
+                    character.moveForward();
+                case WALL:
+                    log.debug('(facing wall)');
+                    switch [
+                        blockBehindCharacter(character) != WALL,
+                        blockOnTheLeftOfCharacter(character) != WALL,
+                        blockOnTheRightOfCharacter(character) != WALL
+                    ] {
+                        case [_, true, true]:
+                            switch character.conduct {
+                                case PREFERS_LEFT:
+                                    character.turnLeft();
+                                    moveCharacter(character, attemptsLeft);
+                                case PREFERS_RIGHT | MOVES_FORWARD:
+                                    character.turnRight();
+                                    moveCharacter(character, attemptsLeft);
+                            }
+                        case [_, true, false]:
+                            character.turnLeft();
+                            moveCharacter(character, attemptsLeft);
+                        case [_, false, true]:
+                            character.turnRight();
+                            moveCharacter(character, attemptsLeft);
+                        case [true, false, false]:
+                            character.turnAround();
+                            moveCharacter(character, attemptsLeft);
+                        default:
+                            log.debug('STOP');
+                    }
+            }
         }
 
     }
@@ -250,6 +313,12 @@ class LevelData extends Model {
     public function blockForwardCharacter(character:CharacterData):BlockKind {
 
         return block(character.xForward, character.yForward);
+
+    }
+
+    public function blockForwardForwardCharacter(character:CharacterData):BlockKind {
+
+        return block(character.xForwardForward, character.yForwardForward);
 
     }
 

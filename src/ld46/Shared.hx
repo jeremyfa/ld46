@@ -1,5 +1,6 @@
 package ld46;
 
+import ceramic.Sound;
 import ceramic.Entity;
 import tracker.Observable;
 import ld46.model.LevelData;
@@ -19,5 +20,7 @@ class Shared extends Entity implements Observable {
     public static var game:GameData;
 
     public static var view:GameView;
+
+    public static var bgm:Sound;
 
 }

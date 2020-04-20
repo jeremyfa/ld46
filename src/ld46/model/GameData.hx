@@ -14,6 +14,8 @@ class GameData extends Model {
 
     @observe public var levelData:LevelData = null;
 
+    @observe public var thanksForPlaying:Bool = false;
+
     var clearInterval:Void->Void = null;
 
     var resetingLoop:Bool = false;
@@ -22,8 +24,9 @@ class GameData extends Model {
 
         super();
 
-        this.loadFromKey('game_data');
-        this.autoSaveAsKey('game_data');
+        // Uncomment to enable saving state
+        //this.loadFromKey('game_data');
+        //this.autoSaveAsKey('game_data');
 
         reloadLevel();
 
@@ -68,6 +71,9 @@ class GameData extends Model {
                 unlockedLevels = currentLevel;
             }
         }
+        else {
+            thanksForPlaying = true;
+        }
 
     }
 
@@ -77,6 +83,13 @@ class GameData extends Model {
 
         levelData = switch (currentLevel) {
             case 1: Levels.level01();
+            case 2: Levels.level02();
+            case 3: Levels.level03();
+            case 4: Levels.level04();
+            case 5: Levels.level05();
+            case 6: Levels.level06();
+            case 7: Levels.level07();
+            case 8: Levels.level08();
             default: null;
         }
 

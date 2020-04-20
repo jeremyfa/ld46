@@ -162,8 +162,7 @@ class CharacterShape extends Visual {
             case [NORTH, WEST]:
                 applyOrientation(90);
                 app.oncePostFlushImmediate(() -> {
-                    applyOrientation(0, duration).onceComplete(this, () -> {
-                        applyOrientation(180);
+                    applyOrientation(180, duration).onceComplete(this, () -> {
                         app.onceUpdate(this, _ -> turning = false);
                     });
                 });

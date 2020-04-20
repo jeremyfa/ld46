@@ -1,5 +1,6 @@
 package;
 
+import ceramic.Sounds;
 import ld46.ui.GameView;
 import ld46.model.GameData;
 import ceramic.Fonts;
@@ -38,6 +39,7 @@ class Project extends Entity {
         assets.add(Fonts.SIMPLY_MONO_20);
         assets.add(Fonts.SIMPLY_MONO_60);
         assets.add(Fonts.ROBOTO_BOLD_20);
+        assets.add(Sounds.MAKEITALIVE);
         assets.onceComplete(this, assetsReady);
         assets.load();
 

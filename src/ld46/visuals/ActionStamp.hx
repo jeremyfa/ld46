@@ -10,21 +10,19 @@ class ActionStamp extends Quad {
 
     var text:Text;
 
-    var actionData:ActionData;
-
-    var number(default, set):Int;
+    public var number(default, set):Int;
     function set_number(number:Int):Int {
         this.number = number;
         text.content = '' + number;
         return number;
     }
 
-    public function new(number:Int, actionData:ActionData) {
+    public function new(number:Int) {
 
         super();
 
-        color = Color.WHITE;//Color.interpolate(ACTION_STAMP_COLOR, Color.WHITE, 0.5);
-        transparent = true;
+        color = BLOCK_GROUND_COLOR;
+        transparent = false;
 
         size(BLOCK_SIZE, BLOCK_SIZE);
 
@@ -34,7 +32,7 @@ class ActionStamp extends Quad {
         text.align = CENTER;
         text.anchor(0.5, 0.525);
         text.pos(width * 0.5, height * 0.5);
-        //text.rotation = 35;
+        text.inheritAlpha = true;
         add(text);
 
         var border = new Border();
@@ -42,9 +40,9 @@ class ActionStamp extends Quad {
         border.borderSize = 2;
         border.borderColor = ACTION_STAMP_COLOR;
         border.size(width, height);
+        border.inheritAlpha = true;
         add(border);
 
-        this.actionData = actionData;
         this.number = number;
 
     }

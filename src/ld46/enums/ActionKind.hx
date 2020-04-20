@@ -8,12 +8,12 @@ enum ActionKind {
 
     TURN_AROUND;
 
+    MOVE_FORWARD;
+
     JUMP_FORWARD;
 
     JUMP_LEFT;
 
     JUMP_RIGHT;
-
-    JUMP_BACKWARD;
 
 }

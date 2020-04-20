@@ -1,5 +1,7 @@
 package ld46.ui;
 
+import ceramic.Timer;
+import ceramic.Sounds;
 import ld46.visuals.LevelGrid;
 import ceramic.ui.TextView;
 import ceramic.Color;
@@ -7,6 +9,8 @@ import ceramic.Fonts;
 import ceramic.Quad;
 import tracker.Autorun.*;
 import ceramic.ui.View;
+
+using StringTools;
 
 class GameView extends View {
 
@@ -18,7 +22,15 @@ class GameView extends View {
 
     var endGameText:TextView;
 
+    var tipText:TextView;
+
     var clickToDoText:TextView;
+
+    var characterList:CharacterListView;
+
+    var actionList:ActionListView;
+
+    var thanksForPlaying:TextView;
 
     public function new() {
 
@@ -52,7 +64,7 @@ class GameView extends View {
         });
 
         title = new TextView();
-        title.color = Color.WHITE;
+        title.textColor = TEXT_COLOR;
         title.pointSize = 40;
         title.font = assets.font(Fonts.SIMPLY_MONO_60);
         title.align = CENTER;
@@ -61,8 +73,20 @@ class GameView extends View {
         title.depth = 30;
         add(title);
 
+        tipText = new TextView();
+        tipText.textColor = TEXT_COLOR;
+        tipText.pointSize = 14;
+        tipText.font = assets.font(Fonts.SIMPLY_MONO_20);
+        tipText.align = CENTER;
+        tipText.verticalAlign = CENTER;
+        tipText.anchor(0.5, 0.5);
+        tipText.content = '';
+        tipText.viewWidth = 100;
+        tipText.depth = 30;
+        add(tipText);
+
         endGameText = new TextView();
-        endGameText.color = Color.WHITE;
+        endGameText.textColor = TEXT_COLOR;
         endGameText.pointSize = 40;
         endGameText.font = assets.font(Fonts.SIMPLY_MONO_60);
         endGameText.align = CENTER;
@@ -73,19 +97,63 @@ class GameView extends View {
         add(endGameText);
 
         clickToDoText = new TextView();
-        clickToDoText.color = Color.WHITE;
+        clickToDoText.textColor = TEXT_COLOR;
         clickToDoText.pointSize = 20;
         clickToDoText.font = assets.font(Fonts.SIMPLY_MONO_20);
         clickToDoText.align = CENTER;
         clickToDoText.verticalAlign = CENTER;
         clickToDoText.anchor(0.5, 0.5);
         clickToDoText.content = '';
-        clickToDoText.depth = 30;
+        clickToDoText.depth = 40;
+        clickToDoText.onPointerDown(this, _ -> {
+            trace('CLICK RETRY');
+            if (game.levelData != null && game.levelData.status == RUNNING) {
+                game.reloadLevel();
+            }
+        });
         add(clickToDoText);
+
+        thanksForPlaying = new TextView();
+        thanksForPlaying.transparent = false;
+        thanksForPlaying.color = BACKGROUND_COLOR;
+        thanksForPlaying.textColor = TEXT_COLOR;
+        thanksForPlaying.pointSize = 20;
+        thanksForPlaying.font = assets.font(Fonts.SIMPLY_MONO_20);
+        thanksForPlaying.align = CENTER;
+        thanksForPlaying.verticalAlign = CENTER;
+        thanksForPlaying.anchor(0.5, 0.5);
+        thanksForPlaying.content = '
+THANKS FOR PLAYING
+
+THIS SMALL GAME WAS CREATED BY JEREMY FAIVRE FOR LDJAM46
+
+I WISH I HAD TIME TO ADD MORE LEVELS...
+
+TELL ME IF YOU LIKED IT!
+I HAVE PLENTY OF IDEAS TO EXPAND THE CONCEPT!
+        '.trim();
+        thanksForPlaying.depth = 50;
+        autorun(() -> {
+            thanksForPlaying.active = game.thanksForPlaying;
+        });
+        add(thanksForPlaying);
+
+        characterList = new CharacterListView();
+        characterList.depth = 30;
+        add(characterList);
+
+        actionList = new ActionListView();
+        actionList.depth = 30;
+        add(actionList);
 
         autorun(updateOverlay);
         autorun(updateLevelGrid);
         autorun(updateTexts);
+
+        screen.oncePointerDown(this, _ -> {
+            bgm = assets.sound(Sounds.MAKEITALIVE);
+            bgm.play(0, true);
+        });
 
     }
 
@@ -117,7 +185,7 @@ class GameView extends View {
 
         if (levelData == null || levelData.status != RUNNING) {
             overlay.active = true;
-            overlay.transparent = (levelData != null && levelData.status != LOST && levelData.status != NONE);
+            overlay.transparent = true;//(levelData != null && levelData.status != NONE);
         }
         else {
             overlay.active = false;
@@ -129,20 +197,64 @@ class GameView extends View {
 
         var levelData = game.levelData;
 
-        if (levelData != null && levelData.characters.length > 1) {
-            title.content = 'KEEP THEM ALIVE';
+        if (levelData != null) {
+
+            var tip = levelData.tip;
+            tipText.content = tip != null && levelData.status == LOST ? tip : 'LEVEL ${game.currentLevel}';
+
+            switch levelData.status {
+                case NONE:
+                    tipText.active = true;
+                case RUNNING:
+                    tipText.active = false;
+                case WON:
+                    tipText.active = false;
+                case LOST:
+                    tipText.active = true;
+            }
+
+            switch levelData.status {
+                case NONE | RUNNING:
+                    if (levelData.characters.length > 1) {
+                        title.content = 'KEEP THEM ALIVE';
+                    }
+                    else {
+                        title.content = 'KEEP IT ALIVE';
+                    }
+                case WON:
+                    title.content = 'GOOD JOB';
+                case LOST:
+                    title.content = 'OH, NO...';
+            }
         }
         else {
+            tipText.active = false;
             title.content = 'KEEP IT ALIVE';
+        }
+
+        if (levelData != null) {
+            characterList.active = true;
+        }
+        else {
+            characterList.active = false;
         }
 
         if (levelData == null || levelData.status == RUNNING) {
             endGameText.active = false;
-            clickToDoText.active = false;
+            title.active = false;
+
+            if (levelData != null) {
+                clickToDoText.active = true;
+                clickToDoText.content = 'RETRY';
+            }
+            else {
+                clickToDoText.active = false;
+            }
         }
         else {
             endGameText.active = true;
             clickToDoText.active = true;
+            title.active = true;
             switch levelData.status {
                 case NONE:
                     endGameText.content = '';
@@ -156,7 +268,7 @@ class GameView extends View {
                     }
                     clickToDoText.content = 'CLICK TO PLAY NEXT LEVEL';
                 case LOST:
-                    endGameText.content = 'YOU LOST ONE FELLOW...';
+                    endGameText.content = 'YOU LOST ONE FELLOW!';
                     clickToDoText.content = 'CLICK TO TRY AGAIN';
                 default:
             }
@@ -166,14 +278,30 @@ class GameView extends View {
 
     override function layout() {
 
+        // Should not be needed but it is needed and I didn't have time to know why
+        if (title.text.contentDirty)
+            title.text.computeContent();
+        if (tipText.text.contentDirty)
+            tipText.text.computeContent();
+        if (clickToDoText.text.contentDirty)
+            clickToDoText.text.computeContent();
+        if (endGameText.text.contentDirty)
+            endGameText.text.computeContent();
+
         levelGrid.pos(width * 0.5, height * 0.5);
 
         overlay.size(width, height);
         overlay.pos(width * 0.5, height * 0.5);
 
+        title.autoComputeSize(true);
         title.pos(
             width * 0.5,
             70
+        );
+
+        tipText.pos(
+            width * 0.5,
+            120
         );
 
         endGameText.pos(
@@ -181,10 +309,22 @@ class GameView extends View {
             height - 100
         );
 
+        clickToDoText.autoComputeSize(true);
         clickToDoText.pos(
             width * 0.5,
             height - 70
         );
+
+        characterList.anchor(0, 0);
+        characterList.pos(50, 55);
+        characterList.autoComputeSize(true);
+
+        actionList.anchor(1, 0);
+        actionList.pos(width - 50, 55);
+        actionList.autoComputeSize(true);
+
+        thanksForPlaying.size(width, height);
+        thanksForPlaying.pos(width * 0.5, height * 0.5);
 
     }
 

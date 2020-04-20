@@ -7,6 +7,9 @@ app:
 
     libs: []
 
+    defines:
+        #- tracker_debug_save
+
     if web:
         +defines:
             - js-source-map

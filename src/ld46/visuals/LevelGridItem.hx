@@ -17,6 +17,10 @@ class LevelGridItem extends Quad implements Observable {
 
     @observe public var blockY:Int;
 
+    @observe public var hover:Bool = false;
+
+    var stampPreview:ActionStamp = null;
+
     public function new(levelData:LevelData, blockX:Int, blockY:Int, value:BlockKind) {
 
         super();
@@ -29,6 +33,13 @@ class LevelGridItem extends Quad implements Observable {
         size(BLOCK_SIZE, BLOCK_SIZE);
 
         autorun(updateDisplay);
+
+        onPointerOver(this, info -> {
+            hover = true;
+        });
+        onPointerOut(this, info -> {
+            hover = false;
+        });
         
     }
 
@@ -39,6 +50,37 @@ class LevelGridItem extends Quad implements Observable {
         var color = this.color;
 
         unobserve();
+
+        switch value {
+            case GROUND:
+                reobserve();
+                if (hover && levelData != null && levelData.status == RUNNING) {
+                    var action = levelData.nextUsableAction();
+                    unobserve();
+                    if (action != null) {
+                        var actionNumber = levelData.actions.indexOf(action) + 1;
+                        if (stampPreview == null) {
+                            stampPreview = new ActionStamp(actionNumber);
+                            add(stampPreview);
+                        }
+                        stampPreview.number = actionNumber;
+                        stampPreview.alpha = 0.4;
+                        stampPreview.active = true;
+                    }
+                    else {
+                        if (stampPreview != null)
+                            stampPreview.active = false;
+                    }
+                }
+                else {
+                    unobserve();
+                    if (stampPreview != null)
+                        stampPreview.active = false;
+                }
+            default:
+                if (stampPreview != null)
+                    stampPreview.active = false;
+        }
 
         switch value {
             case WALL:
@@ -72,7 +114,11 @@ class LevelGridItem extends Quad implements Observable {
                 var character = levelData.characterOnBlock(blockX, blockY);
                 unobserve();
                 if (character != null) {
-                    color = Color.interpolate(color, Color.WHITE, 0.5);
+                    if (character.matchesGoal(value))
+                        color = Color.interpolate(color, Color.WHITE, 0.5);
+                    else
+                        //color = GOAL_KILLED_COLOR;//Color.interpolate(color, Color.BLACK, 0.75);
+                        color = Color.interpolate(color, Color.BLACK, 0.5);
                 }
                 else {
                     color = Color.interpolate(color, Color.BLACK, 0.5);

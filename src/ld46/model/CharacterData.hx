@@ -1,5 +1,6 @@
 package ld46.model;
 
+import ld46.enums.BlockKind;
 import ld46.enums.CharacterStatus;
 import ceramic.Timer;
 import ld46.enums.Direction;
@@ -17,12 +18,24 @@ class CharacterData extends Model {
 
     @observe public var y:Float;
 
+    public var forceDirection:Bool = false;
+
+    public var didJump:Bool = false;
+
     public var xForward(get, never):Float;
     inline function get_xForward():Float return switch direction {
         case NORTH: x;
         case EAST: x + 1;
         case SOUTH: x;
         case WEST: x - 1;
+    }
+
+    public var xForwardForward(get, never):Float;
+    inline function get_xForwardForward():Float return switch direction {
+        case NORTH: x;
+        case EAST: x + 2;
+        case SOUTH: x;
+        case WEST: x - 2;
     }
 
     public var xBehind(get, never):Float;
@@ -54,6 +67,14 @@ class CharacterData extends Model {
         case NORTH: y - 1;
         case EAST: y;
         case SOUTH: y + 1;
+        case WEST: y;
+    }
+
+    public var yForwardForward(get, never):Float;
+    inline function get_yForwardForward():Float return switch direction {
+        case NORTH: y - 2;
+        case EAST: y;
+        case SOUTH: y + 2;
         case WEST: y;
     }
 
@@ -110,6 +131,19 @@ class CharacterData extends Model {
 
     }
 
+    public function matchesGoal(block:BlockKind):Bool {
+
+        return switch block {
+            case GOAL_A: group == 0;
+            case GOAL_B: group == 1;
+            case GOAL_C: group == 2;
+            case GOAL_D: group == 3;
+            case GOAL_E: group == 4;
+            default: false;
+        }
+
+    }
+
     public function turnLeft():Void {
 
         direction = switch direction {
@@ -154,6 +188,36 @@ class CharacterData extends Model {
                 y++;
             case WEST:
                 x--;
+        }
+
+    }
+
+    public function jumpForward():Void {
+
+        switch direction {
+            case NORTH:
+                y -= 2;
+            case EAST:
+                x += 2;
+            case SOUTH:
+                y += 2;
+            case WEST:
+                x -= 2;
+        }
+
+    }
+
+    public function moveBackward():Void {
+
+        switch direction {
+            case NORTH:
+                y++;
+            case EAST:
+                x--;
+            case SOUTH:
+                y--;
+            case WEST:
+                x++;
         }
 
     }
