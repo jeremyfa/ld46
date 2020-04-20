@@ -1,8 +1,8 @@
 app:
-    package: mycompany.ld46
+    package: jeremyfa.ld46
     name: ld46
     displayName: ld46
-    author: My Company
+    author: Jeremy Faivre
     version: '1.0'
 
     libs: []
