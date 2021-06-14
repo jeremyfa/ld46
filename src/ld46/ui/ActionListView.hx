@@ -1,10 +1,10 @@
 package ld46.ui;
 
-import ceramic.Fonts;
+import assets.Fonts;
 import ceramic.Color;
-import ceramic.ui.TextView;
-import ceramic.ui.RowLayout;
-import ceramic.ui.ColumnLayout;
+import ceramic.TextView;
+import ceramic.RowLayout;
+import ceramic.ColumnLayout;
 
 class ActionListView extends ColumnLayout {
 
@@ -33,7 +33,7 @@ class ActionListView extends ColumnLayout {
         var actionInfo = new TextView();
         actionInfo.textColor = TEXT_COLOR;
         actionInfo.pointSize = 20;
-        actionInfo.font = assets.font(Fonts.SIMPLY_MONO_20);
+        actionInfo.font = assets.font(Fonts.SIMPLY_MONO);
         actionInfo.align = RIGHT;
         actionInfo.verticalAlign = CENTER;
         actionInfo.anchor(0.5, 0.5);

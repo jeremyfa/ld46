@@ -2,7 +2,7 @@ package ld46.ui;
 
 import ceramic.Text;
 import ceramic.Quad;
-import ceramic.ui.View;
+import ceramic.View;
 
 class ActionPreviewView extends View {
 

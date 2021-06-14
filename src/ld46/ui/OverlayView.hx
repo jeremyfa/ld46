@@ -1,6 +1,6 @@
 package ld46.ui;
 
-import ceramic.ui.View;
+import ceramic.View;
 
 class OverlayView extends View {
     

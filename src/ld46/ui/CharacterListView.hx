@@ -1,10 +1,10 @@
 package ld46.ui;
 
-import ceramic.Fonts;
+import assets.Fonts;
 import ceramic.Color;
-import ceramic.ui.TextView;
-import ceramic.ui.RowLayout;
-import ceramic.ui.ColumnLayout;
+import ceramic.TextView;
+import ceramic.RowLayout;
+import ceramic.ColumnLayout;
 
 class CharacterListView extends ColumnLayout {
 
@@ -35,7 +35,7 @@ class CharacterListView extends ColumnLayout {
         var characterInfo = new TextView();
         characterInfo.textColor = TEXT_COLOR;
         characterInfo.pointSize = 20;
-        characterInfo.font = assets.font(Fonts.SIMPLY_MONO_20);
+        characterInfo.font = assets.font(Fonts.SIMPLY_MONO);
         characterInfo.align = LEFT;
         characterInfo.verticalAlign = CENTER;
         characterInfo.anchor(0.5, 0.5);

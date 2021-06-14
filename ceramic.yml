@@ -7,6 +7,9 @@ app:
 
     libs: []
 
+    plugins:
+        - ui
+
     defines:
         #- tracker_debug_save
 

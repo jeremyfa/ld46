@@ -2,3 +2,6 @@
 .haxelib
 /out
 /completion.hxml
+/project/unity
+/project/ios
+/project/android

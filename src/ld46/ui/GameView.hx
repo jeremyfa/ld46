@@ -1,14 +1,15 @@
 package ld46.ui;
 
+import assets.Shaders;
 import ceramic.Timer;
-import ceramic.Sounds;
+import assets.Sounds;
 import ld46.visuals.LevelGrid;
-import ceramic.ui.TextView;
+import ceramic.TextView;
 import ceramic.Color;
-import ceramic.Fonts;
+import assets.Fonts;
 import ceramic.Quad;
 import tracker.Autorun.*;
-import ceramic.ui.View;
+import ceramic.View;
 
 using StringTools;
 
@@ -66,7 +67,7 @@ class GameView extends View {
         title = new TextView();
         title.textColor = TEXT_COLOR;
         title.pointSize = 40;
-        title.font = assets.font(Fonts.SIMPLY_MONO_60);
+        title.font = assets.font(Fonts.SIMPLY_MONO);
         title.align = CENTER;
         title.verticalAlign = CENTER;
         title.anchor(0.5, 0.5);
@@ -76,7 +77,7 @@ class GameView extends View {
         tipText = new TextView();
         tipText.textColor = TEXT_COLOR;
         tipText.pointSize = 14;
-        tipText.font = assets.font(Fonts.SIMPLY_MONO_20);
+        tipText.font = assets.font(Fonts.SIMPLY_MONO);
         tipText.align = CENTER;
         tipText.verticalAlign = CENTER;
         tipText.anchor(0.5, 0.5);
@@ -88,7 +89,7 @@ class GameView extends View {
         endGameText = new TextView();
         endGameText.textColor = TEXT_COLOR;
         endGameText.pointSize = 40;
-        endGameText.font = assets.font(Fonts.SIMPLY_MONO_60);
+        endGameText.font = assets.font(Fonts.SIMPLY_MONO);
         endGameText.align = CENTER;
         endGameText.verticalAlign = CENTER;
         endGameText.anchor(0.5, 0.5);
@@ -99,7 +100,7 @@ class GameView extends View {
         clickToDoText = new TextView();
         clickToDoText.textColor = TEXT_COLOR;
         clickToDoText.pointSize = 20;
-        clickToDoText.font = assets.font(Fonts.SIMPLY_MONO_20);
+        clickToDoText.font = assets.font(Fonts.SIMPLY_MONO);
         clickToDoText.align = CENTER;
         clickToDoText.verticalAlign = CENTER;
         clickToDoText.anchor(0.5, 0.5);
@@ -118,14 +119,14 @@ class GameView extends View {
         thanksForPlaying.color = BACKGROUND_COLOR;
         thanksForPlaying.textColor = TEXT_COLOR;
         thanksForPlaying.pointSize = 20;
-        thanksForPlaying.font = assets.font(Fonts.SIMPLY_MONO_20);
+        thanksForPlaying.font = assets.font(Fonts.SIMPLY_MONO);
         thanksForPlaying.align = CENTER;
         thanksForPlaying.verticalAlign = CENTER;
         thanksForPlaying.anchor(0.5, 0.5);
         thanksForPlaying.content = '
 THANKS FOR PLAYING
 
-THIS SMALL GAME WAS CREATED BY JEREMY FAIVRE FOR LDJAM46
+THIS SMALL GAME WAS CREATED IN 48H BY JEREMY FAIVRE FOR LDJAM46
 
 I WISH I HAD TIME TO ADD MORE LEVELS...
 
@@ -151,8 +152,14 @@ I HAVE PLENTY OF IDEAS TO EXPAND THE CONCEPT!
         autorun(updateTexts);
 
         screen.oncePointerDown(this, _ -> {
-            bgm = assets.sound(Sounds.MAKEITALIVE);
-            bgm.play(0, true);
+            screen.oncePointerUp(this, _ -> {
+                app.backend.audio.resumeAudioContext(success -> {
+                    bgm = assets.sound(Sounds.MAKEITALIVE);
+                    if (bgm != null) {
+                        bgm.play(0, true);
+                    }
+                });
+            });
         });
 
     }
@@ -278,6 +285,7 @@ I HAVE PLENTY OF IDEAS TO EXPAND THE CONCEPT!
 
     override function layout() {
 
+        /*
         // Should not be needed but it is needed and I didn't have time to know why
         if (title.text.contentDirty)
             title.text.computeContent();
@@ -287,6 +295,7 @@ I HAVE PLENTY OF IDEAS TO EXPAND THE CONCEPT!
             clickToDoText.text.computeContent();
         if (endGameText.text.contentDirty)
             endGameText.text.computeContent();
+        */
 
         levelGrid.pos(width * 0.5, height * 0.5);
 

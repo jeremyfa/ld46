@@ -1,7 +1,7 @@
 package ld46.ui;
 
 import ceramic.Quad;
-import ceramic.ui.View;
+import ceramic.View;
 
 class CharacterPreviewView extends View {
 

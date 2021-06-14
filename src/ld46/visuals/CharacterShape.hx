@@ -62,6 +62,7 @@ class CharacterShape extends Visual {
         shape.pos(width * 0.5, height);
         shape.skewY = -20;
         shape.transform = new Transform();
+        shape.depth = 1;
         add(shape);
 
         subShapes.push(shape);
@@ -78,6 +79,7 @@ class CharacterShape extends Visual {
         shape.size(0.8 * BLOCK_SIZE, 1.5 * BLOCK_SIZE);
         shape.anchor(0.5, 1);
         shape.transform = subShapes[0].transform;
+        shape.depth = 2;
         add(shape);
 
         subShapes.push(shape);
